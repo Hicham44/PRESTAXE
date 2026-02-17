@@ -4,7 +4,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   BarChart, Bar, Cell, AreaChart, Area
 } from 'recharts';
-import { DailyJournal, Statistics, Direction, Trade } from '../types';
+import { DailyJournal, Direction } from '../types';
 import { Language, translations } from '../translations';
 import { DashboardTab, Timeframe } from './Layout';
 
@@ -52,7 +52,6 @@ const Dashboard: React.FC<DashboardProps> = ({ journals, aiAdvice, language, act
   
   const journalsArray = useMemo(() => Object.values(journals), [journals]);
   
-  // Logical timeframe shifts to simulate real data changes
   const tfStats = useMemo(() => {
     const baseMult = timeframe === '15m' ? 0.05 : 
                     timeframe === '1h' ? 0.15 : 
@@ -97,6 +96,10 @@ const Dashboard: React.FC<DashboardProps> = ({ journals, aiAdvice, language, act
 
   const chartData = useMemo(() => {
     let cumulative = 47000;
+    // Handle empty data
+    if (sortedJournals.length === 0) {
+      return [{ date: 'N/A', balance: 47000, pnl: 0 }];
+    }
     return sortedJournals.map(j => {
       const dayPnl = j.trades.reduce((s, t) => s + t.pnl, 0);
       cumulative += dayPnl;
@@ -132,7 +135,6 @@ const Dashboard: React.FC<DashboardProps> = ({ journals, aiAdvice, language, act
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-        {/* TOP METRICS (formerly Gauges column) */}
         <div className="xl:col-span-12">
           <div className="bg-[#14171d] rounded-[2.5rem] border border-[#2d333b] p-8 shadow-2xl">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -168,7 +170,6 @@ const Dashboard: React.FC<DashboardProps> = ({ journals, aiAdvice, language, act
           </div>
         </div>
 
-        {/* MAIN COLUMN: Charts & Data */}
         <div className="xl:col-span-12 space-y-8">
           {/* Main Visualizer Container */}
           <div className="bg-[#14171d] rounded-[2.5rem] border border-[#2d333b] p-10 shadow-2xl h-[600px] flex flex-col relative overflow-hidden">
@@ -196,8 +197,9 @@ const Dashboard: React.FC<DashboardProps> = ({ journals, aiAdvice, language, act
               </div>
             </div>
 
-            <div className="flex-1 w-full min-h-0 relative z-10">
-              <ResponsiveContainer width="100%" height="100%" minHeight={300}>
+            {/* Use a wrapper with a fixed height and min-height to ensure ResponsiveContainer works */}
+            <div className="w-full h-[400px] min-h-[400px] relative z-10 overflow-hidden">
+              <ResponsiveContainer width="100%" height="100%">
                 {activeTab === 'performance' || activeTab === 'profit' ? (
                   <AreaChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
                     <defs>
@@ -264,7 +266,6 @@ const Dashboard: React.FC<DashboardProps> = ({ journals, aiAdvice, language, act
             </div>
           </div>
 
-          {/* Transactions Summary */}
           <div className="bg-[#14171d] rounded-[2.5rem] border border-[#2d333b] overflow-hidden shadow-2xl">
             <div className="p-8 border-b border-[#2d333b] flex justify-between items-center bg-[#0b0f1a]/50">
               <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">{t.transactions}</h3>

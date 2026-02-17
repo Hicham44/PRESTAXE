@@ -77,7 +77,15 @@ export const translations = {
     followedPlan: "Followed Plan",
     controlledRisk: "Controlled Risk",
     noRevengeTrade: "No Revenge Trading",
-    properSetup: "Proper Setup Found"
+    properSetup: "Proper Setup Found",
+    fundamentalBot: "FundamentalBot®",
+    riskStructAI: "RiskStructAI®",
+    execTradeBot: "ExecTradeBot®",
+    researchDesk: "Research Desk",
+    riskDesk: "Risk Desk",
+    executionDesk: "Execution Desk",
+    marketRegime: "Market Regime",
+    nyOpening: "NY Opening Sequence"
   },
   fr: {
     dashboard: "Tableau de Bord",
@@ -154,7 +162,15 @@ export const translations = {
     followedPlan: "Plan Suivi",
     controlledRisk: "Risque Contrôlé",
     noRevengeTrade: "Pas de Revenge Trade",
-    properSetup: "Bon Setup Identifié"
+    properSetup: "Bon Setup Identifié",
+    fundamentalBot: "FundamentalBot®",
+    riskStructAI: "RiskStructAI®",
+    execTradeBot: "ExecTradeBot®",
+    researchDesk: "Desk Recherche",
+    riskDesk: "Desk Risque",
+    executionDesk: "Desk Exécution",
+    marketRegime: "Régime de Marché",
+    nyOpening: "Séquence Ouverture NY"
   },
   ar: {
     dashboard: "لوحة التحكم",
@@ -231,6 +247,14 @@ export const translations = {
     followedPlan: "اتبع الخطة",
     controlledRisk: "مخاطرة محسوبة",
     noRevengeTrade: "لا تداول انتقامي",
-    properSetup: "إعداد سليم"
+    properSetup: "إعداد سليم",
+    fundamentalBot: "فندمنتال بوت®",
+    riskStructAI: "ريسك ستراكت AI®",
+    execTradeBot: "إكزيك تريد بوت®",
+    researchDesk: "مكتب الأبحاث",
+    riskDesk: "مكتب المخاطر",
+    executionDesk: "مكتب التنفيذ",
+    marketRegime: "نظام السوق",
+    nyOpening: "تسلسل افتتاح نيويورك"
   }
 };

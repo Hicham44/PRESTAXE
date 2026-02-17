@@ -53,4 +53,4 @@ export interface Statistics {
   mostActiveDay: string;
 }
 
-export type ViewState = 'dashboard' | 'calendar' | 'journal-day' | 'scanners' | 'journal';
+export type ViewState = 'dashboard' | 'calendar' | 'journal-day' | 'scanners' | 'journal' | 'agents';

@@ -14,70 +14,75 @@ export const getAITradingCoachAdvice = async (journal: DailyJournal[]): Promise<
   }));
 
   const prompt = `
-    You are a professional trading psychology coach. 
-    Analyze the following recent trading journal entries and provide one punchy, actionable tip for improvement.
-    Focus on the relationship between emotions, discipline, and results.
+    Tu es un coach en psychologie du trading professionnel (Style Coach T®). 
+    Analyse ces journaux de trading récents et donne un conseil percutant et actionnable.
+    Focus sur l'Or (XAU/USD) et la discipline à l'ouverture de 9:30 EST.
     
-    Data: ${JSON.stringify(tradesContext)}
+    Données: ${JSON.stringify(tradesContext)}
     
-    Response format: A single short sentence or two that sounds like an expert mentor (Coach T® style).
+    Format: Une seule phrase courte et puissante.
   `;
 
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: prompt,
-      config: {
-        thinkingConfig: { thinkingBudget: 0 }
-      }
+      config: { thinkingConfig: { thinkingBudget: 0 } }
     });
-    return response.text || "Focus on the process, not the outcome. The market rewards discipline.";
+    return response.text || "La discipline à 9:30 définit ta rentabilité sur l'Or.";
   } catch (error) {
-    console.error("Gemini Error:", error);
-    return "The only constant in trading is change. Stay open and embrace it as a skill!";
+    return "Le marché ne punit pas tes erreurs, il punit ton manque de plan.";
   }
 };
 
-export const getLiveScannerResults = async (scannerName: string, logic: string[]): Promise<{text: string, sources: any[]}> => {
+export const getGoldMacroAnalysis = async (): Promise<{text: string, sources: any[]}> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   const prompt = `
-    Search for current financial assets (Crypto or US Stocks) matching this quantitative desk setup: "${scannerName}".
+    Analyse fondamentale en temps réel pour l'Or (XAU/USD) avant l'ouverture US (9:30 EST).
+    Considère: 
+    1. Dollar Index (DXY)
+    2. US 10Y Yields
+    3. News macro (Inflation, Fed, Emploi)
+    4. Sentiment de risque global.
     
-    Logic Framework:
-    ${logic.join('\n')}
-
-    Additional Strategy Directives (if EMA/RSI):
-    - Trend: EMA 20 > SMA 50 > EMA 200 (for Longs) or reverse (for Shorts).
-    - Momentum: RSI14 must be > 50 and RSI must be above its own MA14 (for Longs).
-    - Entry Zone: Assets currently pulling back to EMA 20 or SMA 50 after a momentum surge.
-    
-    Task:
-    1. Scan real-time market data to find 5-8 major tickers currently fitting this logic.
-    2. Format the response as a professional Terminal-style table.
-    3. Include Ticker, Current Price, RSI Value, and Setup Quality (A+, A, B).
-    
-    Return the response as clear Markdown with the table. List verified market sources at the bottom.
+    Donne un résumé ultra-concis : "Sentiment: Bullish/Bearish/Neutral" suivi de 3 points clés.
+    Identifie les zones de liquidité institutionnelle proches du prix actuel.
   `;
 
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-pro-preview',
       contents: prompt,
-      config: {
-        tools: [{ googleSearch: {} }]
-      }
+      config: { tools: [{ googleSearch: {} }] }
     });
-
-    const text = response.text || "No high-probability setups found matching criteria. Scanning continued...";
-    const sources = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
-    
-    return { text, sources };
-  } catch (error) {
-    console.error("Scanner Error:", error);
     return { 
-      text: "Error connecting to quantitative feed. Check network status.", 
-      sources: [] 
+      text: response.text || "Analyse indisponible. Surveillez la volatilité à 9:30.", 
+      sources: response.candidates?.[0]?.groundingMetadata?.groundingChunks || [] 
     };
+  } catch (error) {
+    return { text: "Erreur de connexion au flux macro.", sources: [] };
+  }
+};
+
+export const getLiveScannerResults = async (scannerName: string, logic: string[]): Promise<{text: string, sources: any[]}> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const prompt = `
+    Search for current financial assets matching this quantitative desk setup: "${scannerName}".
+    Logic: ${logic.join('\n')}
+    Return professional Markdown table.
+  `;
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-pro-preview',
+      contents: prompt,
+      config: { tools: [{ googleSearch: {} }] }
+    });
+    return { 
+      text: response.text || "Aucun setup trouvé.", 
+      sources: response.candidates?.[0]?.groundingMetadata?.groundingChunks || [] 
+    };
+  } catch (error) {
+    return { text: "Erreur scanner.", sources: [] };
   }
 };

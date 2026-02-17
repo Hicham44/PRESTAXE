@@ -68,6 +68,13 @@ const Layout: React.FC<LayoutProps> = ({
             isRTL={isRTL}
           />
           <NavItem 
+            icon="fa-solid fa-robot" 
+            label="Agents Desk" 
+            isActive={activeView === 'agents'} 
+            onClick={() => onNavigate('agents')} 
+            isRTL={isRTL}
+          />
+          <NavItem 
             icon="fa-solid fa-radar" 
             label={t.marketScanners} 
             isActive={activeView === 'scanners'} 
@@ -163,7 +170,7 @@ const Layout: React.FC<LayoutProps> = ({
       <main className="flex-1 overflow-y-auto relative">
         <header className="sticky top-0 z-30 flex items-center justify-between px-8 py-4 bg-[#0f1115]/80 backdrop-blur-md border-b border-[#1a1d23]">
           <h1 className="text-lg font-semibold text-gray-200 capitalize">
-             {activeView === 'scanners' ? t.marketScanners : (isRTL ? t[activeView.replace('-', '') as keyof typeof t] : t[activeView as keyof typeof t] || activeView.replace('-', ' '))}
+             {activeView === 'agents' ? 'Agents Desk' : activeView === 'scanners' ? t.marketScanners : (isRTL ? t[activeView.replace('-', '') as keyof typeof t] : t[activeView as keyof typeof t] || activeView.replace('-', ' '))}
           </h1>
           <div className="flex items-center space-x-4">
              <div className="flex items-center bg-[#1a1d23] rounded-lg p-1 border border-[#2d333b]">

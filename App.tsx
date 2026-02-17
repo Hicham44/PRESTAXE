@@ -8,6 +8,7 @@ import CalendarView from './components/CalendarView';
 import JournalDetail from './components/JournalDetail';
 import JournalListView from './components/JournalListView';
 import ScannersView from './components/ScannersView';
+import AgentsView from './components/AgentsView';
 import { getAITradingCoachAdvice } from './services/geminiService';
 import { Language } from './translations';
 import { DashboardTab, Timeframe } from './components/Layout';
@@ -120,6 +121,10 @@ const App: React.FC = () => {
 
       {activeView === 'journal' && (
         <JournalListView journals={journals} onDayClick={handleDayClick} language={language} />
+      )}
+
+      {activeView === 'agents' && (
+        <AgentsView language={language} />
       )}
 
       {activeView === 'scanners' && (

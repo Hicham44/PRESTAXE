@@ -12,6 +12,15 @@ const ScannersView: React.FC<ScannersViewProps> = ({ language }) => {
   const [scanResult, setScanResult] = useState<{title: string, content: string, sources: any[]} | null>(null);
   const [isScanning, setIsScanning] = useState(false);
 
+  // Manual configuration state for Finviz
+  const [finvizLogic, setFinvizLogic] = useState<string[]>([
+    "SMA Align (20 > 50 > 200)", 
+    "Avg Vol over 500K", 
+    "Cur Vol over 1M", 
+    "Perf Today Up"
+  ]);
+  const [isEditingFinviz, setIsEditingFinviz] = useState(false);
+
   const handleLiveScan = async (name: string, logic: string[]) => {
     setIsScanning(true);
     setScanResult(null);
@@ -208,9 +217,13 @@ const ScannersView: React.FC<ScannersViewProps> = ({ language }) => {
           icon="fa-magnifying-glass-chart"
           color="text-cyan-500"
           isScanning={isScanning}
-          logic={["SMA Align", "Avg Vol over 500K", "Cur Vol over 1M", "Perf Today Up"]}
-          onRun={() => handleLiveScan(t.scannerFinviz, ["Finviz Trend logic", "Relative strength identification", "Daily chart breakouts"])}
+          logic={finvizLogic}
+          onRun={() => handleLiveScan(t.scannerFinviz, finvizLogic)}
           t={t}
+          isEditable={true}
+          onEdit={() => setIsEditingFinviz(!isEditingFinviz)}
+          isEditing={isEditingFinviz}
+          onLogicChange={(newLogic) => setFinvizLogic(newLogic.split('\n').filter(l => l.trim() !== ''))}
         />
       </div>
 
@@ -233,10 +246,21 @@ interface EngineCardProps {
   onRun: () => void;
   isQuant?: boolean;
   t: any;
+  isEditable?: boolean;
+  isEditing?: boolean;
+  onEdit?: () => void;
+  onLogicChange?: (logic: string) => void;
 }
 
-const EngineCard: React.FC<EngineCardProps> = ({ title, icon, color, logic, isScanning, onRun, isQuant, t }) => (
-  <div className={`p-6 rounded-2xl border transition-all duration-300 flex flex-col h-full group ${isQuant ? 'bg-indigo-950/20 border-indigo-500/20 hover:border-indigo-500/40 shadow-2xl shadow-indigo-500/5' : 'bg-[#1a1d23] border-[#2d333b] hover:border-gray-600 shadow-xl'}`}>
+const EngineCard: React.FC<EngineCardProps> = ({ 
+  title, icon, color, logic, isScanning, onRun, isQuant, t, 
+  isEditable, isEditing, onEdit, onLogicChange 
+}) => (
+  <div className={`p-6 rounded-2xl border transition-all duration-300 flex flex-col h-full group relative ${
+    isEditing ? 'border-indigo-500 ring-2 ring-indigo-500/20' : 
+    isQuant ? 'bg-indigo-950/20 border-indigo-500/20 hover:border-indigo-500/40 shadow-2xl shadow-indigo-500/5' : 
+    'bg-[#1a1d23] border-[#2d333b] hover:border-gray-600 shadow-xl'
+  }`}>
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center space-x-4">
         <div className={`w-12 h-12 rounded-2xl bg-[#0b0f1a] flex items-center justify-center ${color} shadow-lg border border-white/5 group-hover:scale-110 transition-transform`}>
@@ -251,21 +275,42 @@ const EngineCard: React.FC<EngineCardProps> = ({ title, icon, color, logic, isSc
           </span>
         </div>
       </div>
-      {isQuant && (
-        <div className="px-2 py-0.5 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-[8px] font-black text-indigo-400 uppercase tracking-widest">
-          ALPHA
-        </div>
-      )}
+      <div className="flex items-center space-x-2">
+        {isEditable && (
+          <button 
+            onClick={onEdit}
+            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${isEditing ? 'bg-indigo-600 text-white' : 'bg-[#0b0f1a] text-gray-500 hover:text-white border border-white/5'}`}
+          >
+            <i className={`fa-solid ${isEditing ? 'fa-check' : 'fa-gear'} text-[10px]`}></i>
+          </button>
+        )}
+        {isQuant && (
+          <div className="px-2 py-0.5 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-[8px] font-black text-indigo-400 uppercase tracking-widest">
+            ALPHA
+          </div>
+        )}
+      </div>
     </div>
 
-    <ul className="space-y-2 flex-1 mb-8">
-      {logic.map((l, i) => (
-        <li key={i} className={`flex items-start text-[10px] font-mono leading-relaxed ${isQuant ? 'text-indigo-200/50' : 'text-gray-500'}`}>
-          <i className={`fa-solid fa-chevron-right text-[7px] mt-1.5 mr-3 flex-shrink-0 ${isQuant ? 'text-indigo-500' : 'text-indigo-500/30'}`}></i>
-          {l}
-        </li>
-      ))}
-    </ul>
+    <div className="flex-1 mb-8 overflow-hidden">
+      {isEditing ? (
+        <textarea
+          className="w-full h-full bg-[#0b0f1a] border border-indigo-500/30 rounded-xl p-4 text-[10px] font-mono text-indigo-300 focus:outline-none focus:border-indigo-500 transition-all resize-none leading-relaxed"
+          value={logic.join('\n')}
+          onChange={(e) => onLogicChange?.(e.target.value)}
+          placeholder="Enter one logic rule per line..."
+        />
+      ) : (
+        <ul className="space-y-2">
+          {logic.map((l, i) => (
+            <li key={i} className={`flex items-start text-[10px] font-mono leading-relaxed ${isQuant ? 'text-indigo-200/50' : 'text-gray-500'}`}>
+              <i className={`fa-solid fa-chevron-right text-[7px] mt-1.5 mr-3 flex-shrink-0 ${isQuant ? 'text-indigo-500' : 'text-indigo-500/30'}`}></i>
+              {l}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
 
     <div className="grid grid-cols-2 gap-3 mt-auto">
       <button 
@@ -275,13 +320,13 @@ const EngineCard: React.FC<EngineCardProps> = ({ title, icon, color, logic, isSc
         {t.copyLogic}
       </button>
       <button 
-        disabled={isScanning}
+        disabled={isScanning || isEditing}
         onClick={onRun}
         className={`py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all shadow-lg flex items-center justify-center space-x-2 ${
           isQuant 
           ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-900/40 active:scale-95' 
           : 'bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20'
-        } ${isScanning ? 'opacity-50 cursor-not-allowed' : ''}`}
+        } ${isScanning || isEditing ? 'opacity-30 cursor-not-allowed' : ''}`}
       >
         <i className="fa-solid fa-bolt text-[8px]"></i>
         <span>{t.liveScan}</span>
